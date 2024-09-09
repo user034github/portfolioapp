@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prosjekter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .prosjekt {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .prosjekt h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+            color: #007BFF;
+        }
+        .prosjekt p {
+            margin: 5px 0;
+            color: #555;
+        }
+        form {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        form input, form textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prosjekt oversikt</h1>
+    <div id="prosjekter-container">
+        <!-- detaljene -->
+    </div>
+
+    <form id="legg-til-prosjekt-form">
+        <h2>Legg til et nytt prosjekt</h2>
+        <input type="text" id="prosjekt-tittel" placeholder="Prosjekt Tittel" required>
+        <textarea id="prosjekt-beskrivelse" placeholder="Prosjekt Beskrivelse" required></textarea>
+        <button type="submit">Legg til et prosjekt</button>
+    </form>
+
+    <script>
+        function fetchProsjekter() {
+            fetch('/prosjekter')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('prosjekter-container');
+                    container.innerHTML = '';
+                    if (Array.isArray(data)) {
+                        data.forEach(prosjekt => {
+                            const prosjektDiv = document.createElement('div');
+                            prosjektDiv.className = 'prosjekt';
+                            prosjektDiv.innerHTML = `
+                                <h2>${prosjekt.tittel}</h2>
+                                <p>${prosjekt.beskrivelse}</p>
+                            `;
+                            container.appendChild(prosjektDiv);
+                        });
+                    } else {
+                        container.innerHTML = '<p>Ingen prosjekter funnet.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Lesing av prosjekt feilet:', error);
+                    document.getElementById('prosjekter-container').innerHTML = '<p>Error loading prosjekter.</p>';
+                });
+        }
+
+        document.getElementById('legg-til-prosjekt-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const tittel = document.getElementById('prosjekt-tittel').value;
+            const beskrivelse = document.getElementById('prosjekt-beskrivelse').value;
+
+            fetch('/prosjekter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tittel, beskrivelse })
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('prosjekt-tittel').value = '';
+                    document.getElementById('prosjekt-beskrivelse').value = '';
+                    fetchProsjekter();
+                } else {
+                    console.error('Feil med å legge til prosjekt');
+                }
+            })
+            .catch(error => {
+                console.error('Feil:', error);
+            });
+        });
+
+        fetchProsjekter();
+    </script>
+</body>
+</html>

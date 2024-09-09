@@ -1,0 +1,11 @@
+[
+  {
+    "tittel": "Prosjekt 1",
+    "beskrivelse": "Prosjektbeskrivelse",
+    "bilde": "bilder/prosjekt1.png"
+  },
+  {
+    "tittel": "Prosjekt 2",
+    "beskrivelse": "Prosjektbeskrivelse"
+  }
+]
